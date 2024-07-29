@@ -1,0 +1,25 @@
+<%- include('layout') %>
+
+<div class="container mt-4">
+  <h2>Liste de Présence pour le Cours</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Prénom</th>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Présence</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% attendance.forEach(record => { %>
+        <tr>
+          <td><%= record.firstname %></td>
+          <td><%= record.lastname %></td>
+          <td><%= record.email %></td>
+          <td><%= record.present ? 'Présent' : 'Absent' %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>

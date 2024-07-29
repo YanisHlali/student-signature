@@ -1,0 +1,7 @@
+<%- include('layout') %>
+
+<h1>Liste des Présences</h1>
+<% courses.forEach(course => { %>
+  <h2><%= course.subject_name %> - <%= course.promotion_name %></h2>
+  <a href="/attendance/<%= course.id %>">Voir les présences</a>
+<% }) %>

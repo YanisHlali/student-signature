@@ -1,0 +1,44 @@
+<%- include('layout') %>
+
+<div class="container mt-4">
+  <h2>
+    Emploi du Temps de la Promotion <%= promotion.name %> - <%= promotion.year %>
+  </h2>
+  <div id="calendar"></div>
+</div>
+
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet" />
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var classes = <%- JSON.stringify(classes.map(classe => {
+      return {
+        title: classe.subject_name + ' - ' + classe.teacher_name,
+        start: new Date(classe.start).toISOString(),
+        end: new Date(classe.end).toISOString(),
+        classId: classe.id
+      }
+    })) %>;
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'timeGridWeek',
+      locale: 'fr',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'timeGridWeek,timeGridDay'
+      },
+      firstDay: 1,
+      slotMinTime: '08:00:00',
+      slotMaxTime: '18:00:00',
+      events: classes,
+      eventClick: function(info) {
+        window.location.href = '/attendances/class/' + info.event.extendedProps.classId;
+      }
+    });
+    calendar.render();
+  });
+</script>

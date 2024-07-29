@@ -1,0 +1,35 @@
+<%- include('layout') %>
+
+<div class="container mt-4">
+    <h2>Liste des Classes</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Promotion</th>
+                <th>Matière</th>
+                <th>Professeur</th>
+                <th>Début</th>
+                <th>Fin</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% classes.forEach(classe => { %>
+            <tr>
+                <td><%= classe.promotion_name %> (<%= classe.promotion_year %>)</td>
+                <td><%= classe.subject_name %></td>
+                <td><%= classe.teacher_name %></td>
+                <td><%= classe.start %></td>
+                <td><%= classe.end %></td>
+                <td>
+                    <a href="/classes/<%= classe.id %>/edit" class="btn btn-warning btn-sm">Modifier</a>
+                    <form action="/classes/<%= classe.id %>/delete?_method=DELETE" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+    <a href="/classes/create" class="btn btn-success mt-4">Ajouter une Classe</a>
+</div>

@@ -1,0 +1,25 @@
+<%- include('layout') %>
+
+<div class="container mt-4">
+    <h2>Ajouter une Présence</h2>
+    <form action="/attendances/create" method="POST">
+        <div class="form-group">
+            <label for="classe_id">Classe</label>
+            <select id="classe_id" name="classe_id" class="form-control" required>
+                <% classes.forEach(classe => { %>
+                <option value="<%= classe.id %>"><%= classe.promotion_name %> - <%= classe.subject_name %> - <%= new Date(classe.start).toLocaleString() %> à <%= new Date(classe.end).toLocaleString() %></option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="student_id">Étudiant</label>
+            <select id="student_id" name="student_id" class="form-control" required>
+                <% students.forEach(student => { %>
+                <option value="<%= student.id %>"><%= student.firstname %> <%= student.lastname %></option>
+                <% }); %>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success">Ajouter</button>
+        <a href="/attendances" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>

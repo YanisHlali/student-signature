@@ -1,0 +1,50 @@
+<%- include('layout') %>
+
+<div class="container mt-4">
+    <h2>Modifier une Classe</h2>
+    <form action="/classes/<%= classe.id %>?_method=PUT" method="POST" onsubmit="return validateForm()">
+        <div class="form-group">
+            <label for="promotion_id">Promotion</label>
+            <select id="promotion_id" name="promotion_id" class="form-control" required>
+                <% promotions.forEach(promotion => { %>
+                <option value="<%= promotion.id %>" <%= classe.promotion_id === promotion.id ? 'selected' : '' %>>
+                    <%= promotion.name %> (<%= promotion.year %>)
+                </option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="course_id">Cours</label>
+            <select id="course_id" name="course_id" class="form-control" required>
+                <% courses.forEach(course => { %>
+                <option value="<%= course.id %>" <%= classe.course_id === course.id ? 'selected' : '' %>>
+                    <%= course.subject_name %> par <%= course.user_firstname %> <%= course.user_lastname %>
+                </option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="start">Début</label>
+            <input type="datetime-local" id="start" name="start" class="form-control" value="<%= classe.start.toISOString().slice(0, 16) %>" required>
+        </div>
+        <div class="form-group">
+            <label for="end">Fin</label>
+            <input type="datetime-local" id="end" name="end" class="form-control" value="<%= classe.end.toISOString().slice(0, 16) %>" required>
+        </div>
+        <button type="submit" class="btn btn-warning">Modifier</button>
+        <a href="/classes" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+
+<script>
+    function validateForm() {
+        var start = new Date(document.getElementById('start').value);
+        var end = new Date(document.getElementById('end').value);
+
+        if (end <= start) {
+            alert("L'heure de fin doit être après l'heure de début.");
+            return false;
+        }
+        return true;
+    }
+</script>

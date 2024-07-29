@@ -1,0 +1,21 @@
+<%- include('layout') %>
+
+<header class="bg-dark text-white text-center py-3 mb-4">
+  <h1>Profil de l'Utilisateur</h1>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h2><%= user.firstname %> <%= user.lastname %></h2>
+    </div>
+    <div class="card-body">
+      <p><strong>Email:</strong> <%= user.email %></p>
+      <p><strong>Username:</strong> <%= user.username %></p>
+      <p><strong>Biography:</strong> <%= user.biography %></p>
+      <p><strong>Inscription:</strong> <%= new Date(user.created_at).toLocaleDateString() %></p>
+      <p><strong>Vérifié:</strong> <%= user.is_verified ? 'Oui' : 'Non' %></p>
+      <p><strong>Banni:</strong> <%= user.is_banned ? 'Oui' : 'Non' %></p>
+      <a href="/profile/edit" class="btn btn-primary">Modifier Profil</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+<!-- views/createCourse.ejs -->
+<%- include('layout') %>
+
+<header class="bg-dark text-white text-center py-3 mb-4">
+  <h1>Créer un Cours</h1>
+</header>
+<div class="container">
+  <form action="/courses/create" method="POST">
+    <div class="form-group">
+      <label for="professor_id">Professeur</label>
+      <select class="form-control" id="professor_id" name="user_id" required>
+        <% professors.forEach(professor => { %>
+          <option value="<%= professor.id %>"><%= professor.firstname %> <%= professor.lastname %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="subject_id">Sujet</label>
+      <select class="form-control" id="subject_id" name="subject_id" required>
+        <% subjects.forEach(subject => { %>
+          <option value="<%= subject.id %>"><%= subject.name %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="promotion_id">Promotion</label>
+      <select class="form-control" id="promotion_id" name="promotion_id" required>
+        <% promotions.forEach(promotion => { %>
+          <option value="<%= promotion.id %>"><%= promotion.name %> - <%= promotion.year %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="start">Début</label>
+      <input type="datetime-local" class="form-control" id="start" name="start" required>
+    </div>
+    <div class="form-group">
+      <label for="end">Fin</label>
+      <input type="datetime-local" class="form-control" id="end" name="end" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Créer</button>
+  </form>
+</div>

@@ -1,0 +1,242 @@
+const Attendance = require('../models/Attendance');
+const Course = require('../models/Course');
+const Classe = require('../models/Classe');
+const Student = require('../models/Student');
+const Promotion = require('../models/Promotion');
+const crypto = require('crypto');
+
+async function generateAttendanceLinks(req, res) {
+  try {
+    const { classeId } = req.params;
+    const userId = req.user.id; // Récupérer l'ID de l'utilisateur connecté
+
+    const classe = await new Promise((resolve, reject) => {
+      Classe.getClasseById(classeId, (err, classe) => {
+        if (err) return reject(err);
+        resolve(classe[0]);
+      });
+    });
+
+    if (!classe) {
+      return res.status(404).send('Class not found');
+    }
+
+    const course = await new Promise((resolve, reject) => {
+      Course.getCourseById(classe.course_id, (err, course) => {
+        if (err) return reject(err);
+        resolve(course[0]);
+      });
+    });
+
+    if (!course) {
+      return res.status(404).send('Course not found');
+    }
+
+    const promotion = await new Promise((resolve, reject) => {
+      Promotion.getPromotionById(classe.promotion_id, (err, promotion) => {
+        if (err) return reject(err);
+        resolve(promotion[0]);
+      });
+    });
+
+    if (!promotion) {
+      return res.status(404).send('Promotion not found');
+    }
+
+    const students = await new Promise((resolve, reject) => {
+      Student.getStudentsByPromotionId(classe.promotion_id, (err, students) => {
+        if (err) return reject(err);
+        resolve(students);
+      });
+    });
+
+    if (!students || students.length === 0) {
+      return res.status(404).send('No students found for this promotion');
+    }
+
+    const links = await Promise.all(students.map(async (student) => {
+      const token = crypto.randomBytes(16).toString('hex');
+      const expiryTime = new Date(classe.end);
+
+      const studentIdResult = await new Promise((resolve, reject) => {
+        Student.getStudentIdByUserId(student.user_id, (err, result) => {
+          if (err) return reject(err);
+          resolve(result[0]);
+        });
+      });
+
+      const studentId = studentIdResult ? studentIdResult.id : null;
+
+      if (!studentId) {
+        throw new Error('Student ID not found');
+      }
+
+      await new Promise((resolve, reject) => {
+        Attendance.createAttendanceToken(token, studentId, classeId, expiryTime, (err) => {
+          if (err) return reject(err);
+          resolve();
+        });
+      });
+
+      return {
+        student,
+        link: `${req.protocol}://${req.get('host')}/attendances/sign?token=${token}`
+      };
+    }));
+
+    const formatTime = (dateString) => {
+      const date = new Date(dateString);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    classe.day = new Date(classe.start).toLocaleDateString();
+    classe.start = formatTime(classe.start);
+    classe.end = formatTime(classe.end);
+
+    console.log({ links, classe, course, promotion });
+
+    res.render('attendanceLinks', { links, classe, course, promotion, userId });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+async function signAttendance(req, res) {
+  try {
+    const { token } = req.query;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    const tokenData = await new Promise((resolve, reject) => {
+      Attendance.validateToken(token, (err, data) => {
+        if (err) return reject(err);
+        resolve(data);
+      });
+    });
+
+    if (!tokenData) {
+      return res.status(400).send('Invalid or expired token');
+    }
+
+    if (userRole === 'student') {
+      const studentIdResult = await new Promise((resolve, reject) => {
+        Student.getStudentIdByUserId(userId, (err, result) => {
+          if (err) return reject(err);
+          resolve(result[0]);
+        });
+      });
+
+      if (tokenData.student_id !== studentIdResult.id) {
+        return res.status(403).send('Forbidden');
+      }
+    }
+
+    await new Promise((resolve, reject) => {
+      Attendance.markAttendance(tokenData.classe_id, tokenData.student_id, (err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+
+    res.send('Attendance successfully signed');
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+async function getAttendanceByCourse(req, res) {
+  const { courseId } = req.params;
+  const userId = req.user.id;
+  const userRole = req.user.role;
+
+  try {
+    const classe = await new Promise((resolve, reject) => {
+      Classe.getClasseByCourseId(courseId, (err, classe) => {
+        if (err) return reject(err);
+        resolve(classe[0]);
+      });
+    });
+
+    if (!classe) {
+      return res.status(404).send('Class not found');
+    }
+
+    if (userRole === 'student') {
+      const studentInClass = await new Promise((resolve, reject) => {
+        Student.getStudentIdByUserId(userId, (err, result) => {
+          if (err) return reject(err);
+          resolve(result[0]);
+        });
+      });
+
+      if (!studentInClass || studentInClass.promotion_id !== classe.promotion_id) {
+        return res.status(403).send('Forbidden');
+      }
+    } else if (userRole === 'professor') {
+      if (classe.user_id !== userId) {
+        return res.status(403).send('Forbidden');
+      }
+    }
+
+    const attendance = await new Promise((resolve, reject) => {
+      Attendance.getAttendanceByCourse(classe.id, (err, attendance) => {
+        if (err) return reject(err);
+        resolve(attendance);
+      });
+    });
+
+    const uniqueAttendance = [];
+    const seenStudents = new Set();
+
+    attendance.forEach(record => {
+      if (!seenStudents.has(record.student_id)) {
+        seenStudents.add(record.student_id);
+        uniqueAttendance.push(record);
+      }
+    });
+
+    res.render('attendanceByCourse', { attendance: uniqueAttendance });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+async function getAttendanceByClass(req, res) {
+  const { classId } = req.params;
+  try {
+    const attendance = await new Promise((resolve, reject) => {
+      Attendance.getAttendanceByClass(classId, (err, attendance) => {
+        if (err) return reject(err);
+        resolve(attendance);
+      });
+    });
+
+    const uniqueAttendance = [];
+    const seenStudents = new Set();
+
+    attendance.forEach(record => {
+      if (!seenStudents.has(record.student_id)) {
+        seenStudents.add(record.student_id);
+        uniqueAttendance.push(record);
+      }
+    });
+
+    // Ajout du userRole
+    const userRole = req.user.is_admin ? 'admin' : (req.user.is_professor ? 'professor' : 'student');
+
+    console.log({ attendance: uniqueAttendance, user: req.user, userRole });
+
+    res.render('attendanceByClass', { attendance: uniqueAttendance, user: req.user, userRole });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+
+
+module.exports = {
+  generateAttendanceLinks,
+  signAttendance,
+  getAttendanceByCourse,
+  getAttendanceByClass
+};

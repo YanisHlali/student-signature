@@ -1,0 +1,118 @@
+<%- include('layout') %>
+
+<header class="bg-dark text-white text-center py-3 mb-4">
+    <h1>Liste des Étudiants</h1>
+</header>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mt-4">Étudiants avec Promotion</h2>
+        <div>
+            <a href="/students/create" class="btn btn-primary">Créer un étudiant avec promotion</a>
+            <a href="/users/create" class="btn btn-secondary">Créer un étudiant sans promotion</a>
+        </div>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th class="sortable" onclick="sortTable(0, 'studentsWithPromotion')">Prénom</th>
+                <th class="sortable" onclick="sortTable(1, 'studentsWithPromotion')">Nom</th>
+                <th class="sortable" onclick="sortTable(2, 'studentsWithPromotion')">Promotion</th>
+                <th class="sortable" onclick="sortTable(3, 'studentsWithPromotion')">Année</th>
+                <th class="sortable" onclick="sortTable(4, 'studentsWithPromotion')">École</th>
+                <th class="sortable" onclick="sortTable(5, 'studentsWithPromotion')">Ville</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="studentsWithPromotion">
+            <% studentsWithPromotion.forEach(student => { %>
+            <tr>
+                <td><%= student.firstname %></td>
+                <td><%= student.lastname %></td>
+                <td><%= student.promotion_name %></td>
+                <td><%= student.year %></td>
+                <td><%= student.schoolName %></td>
+                <td><%= student.schoolCity %></td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a href="/students/<%= student.id %>/edit" class="btn btn-warning btn-sm">Modifier</a>
+                        <form action="/students/<%= student.id %>/delete?_method=DELETE" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+    <h2 class="mt-4">Étudiants sans Promotion</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th class="sortable" onclick="sortTable(0, 'studentsWithoutPromotion')">Prénom</th>
+                <th class="sortable" onclick="sortTable(1, 'studentsWithoutPromotion')">Nom</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="studentsWithoutPromotion">
+            <% studentsWithoutPromotion.forEach(student => { %>
+            <tr>
+                <td><%= student.firstname %></td>
+                <td><%= student.lastname %></td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <form action="/students/assign-promotion/<%= student.id %>" method="POST" class="form-inline mr-2">
+                            <div class="form-group">
+                                <select name="promotion_id" class="form-control" required>
+                                    <% promotions.forEach(promotion => { %>
+                                    <option value="<%= promotion.id %>"><%= promotion.name %> - <%= promotion.year %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success ml-2">Affecter</button>
+                        </form>
+                        <div class="btn-group" role="group">
+                            <a href="/users/<%= student.id %>/edit" class="btn btn-warning btn-sm">Modifier</a>
+                            <form action="/users/<%= student.id %>/delete?_method=DELETE" method="POST" style="display: inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                            </form>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
+<script>
+    function sortTable(columnIndex, tableId) {
+        var table = document.getElementById(tableId);
+        var rows = Array.from(table.getElementsByTagName("tr"));
+        var isAscending = table.getAttribute("data-sort-direction") === "asc";
+        table.setAttribute("data-sort-direction", isAscending ? "desc" : "asc");
+
+        rows.sort(function (a, b) {
+            var aText = a.getElementsByTagName("td")[columnIndex].innerText;
+            var bText = b.getElementsByTagName("td")[columnIndex].innerText;
+
+            return isAscending
+                ? aText.localeCompare(bText)
+                : bText.localeCompare(aText);
+        });
+
+        rows.forEach(function (row) {
+            table.appendChild(row);
+        });
+
+        // Remove existing sort classes
+        var headers = table.parentElement.getElementsByTagName("th");
+        for (var i = 0; i < headers.length; i++) {
+            headers[i].classList.remove("sort-asc", "sort-desc");
+        }
+
+        // Add sort class to the current header
+        var currentHeader =
+            table.parentElement.getElementsByTagName("th")[columnIndex];
+        currentHeader.classList.add(isAscending ? "sort-asc" : "sort-desc");
+    }
+</script>

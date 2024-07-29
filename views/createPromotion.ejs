@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer une Promotion</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header class="bg-dark text-white text-center py-3 mb-4">
+        <h1>Créer une Promotion</h1>
+    </header>
+    <div class="container">
+        <h2 class="mt-4">Ajouter une Promotion</h2>
+        <form action="/promotions/create" method="POST">
+            <div class="form-group">
+                <label for="school_id">École</label>
+                <select class="form-control" id="school_id" name="school_id" required>
+                    <% schools.forEach(school => { %>
+                    <option value="<%= school.id %>"><%= school.name %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="name">Nom</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="year">Année</label>
+                <input type="number" class="form-control" id="year" name="year" required>
+            </div>
+            <button type="submit" class="btn btn-success">Créer</button>
+        </form>
+        <a href="/promotions" class="btn btn-primary mt-4">Retour à la liste des promotions</a>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

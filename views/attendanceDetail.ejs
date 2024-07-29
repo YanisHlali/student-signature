@@ -1,0 +1,21 @@
+<%- include('layout') %>
+
+<h1>Présences pour <%= attendance[0].course_name %></h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Prénom</th>
+      <th>Nom</th>
+      <th>Date de signature</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% attendance.forEach(record => { %>
+      <tr>
+        <td><%= record.firstname %></td>
+        <td><%= record.lastname %></td>
+        <td><%= record.signed_at %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>

@@ -1,0 +1,35 @@
+<%- include('layout') %>
+
+<div class="container mt-4">
+    <h2>Liste des Présences</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Promotion</th>
+                <th>Matière</th>
+                <th>Étudiant</th>
+                <th>Début</th>
+                <th>Fin</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% attendances.forEach(attendance => { %>
+            <tr>
+                <td><%= attendance.promotion_name %> (<%= attendance.promotion_year %>)</td>
+                <td><%= attendance.subject_name %></td>
+                <td><%= attendance.firstname %> <%= attendance.lastname %></td>
+                <td><%= new Date(attendance.start).toLocaleString() %></td>
+                <td><%= new Date(attendance.end).toLocaleString() %></td>
+                <td>
+                    <a href="/attendances/<%= attendance.id %>/edit" class="btn btn-warning">Modifier</a>
+                    <form action="/attendances/<%= attendance.id %>/delete?_method=DELETE" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+    <a href="/attendances/create" class="btn btn-success mt-4">Ajouter une Présence</a>
+</div>

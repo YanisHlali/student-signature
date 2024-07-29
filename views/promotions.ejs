@@ -1,0 +1,37 @@
+<%- include('layout') %>
+
+<header class="bg-dark text-white text-center py-3 mb-4">
+    <h1>Liste des Promotions</h1>
+</header>
+<div class="container">
+    <div class="d-flex justify-content-end mb-4">
+        <a href="/promotions/create" class="btn btn-success">Ajouter une Promotion</a>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Année</th>
+                <th>École</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% promotions.forEach(promotion => { %>
+                <tr>
+                    <td><%= promotion.name %></td>
+                    <td><%= promotion.year %></td>
+                    <td><%= promotion.school ? promotion.school.name : 'N/A' %></td>
+                    <td>
+                        <a href="/promotions/<%= promotion.id %>/schedule" class="btn btn-info">Voir emploi du temps</a>
+                        <a href="/promotions/<%= promotion.id %>/students" class="btn btn-primary">Voir les étudiants</a>
+                        <a href="/promotions/<%= promotion.id %>/edit" class="btn btn-warning">Modifier</a>
+                        <form action="/promotions/<%= promotion.id %>/delete" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>

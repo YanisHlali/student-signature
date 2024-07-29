@@ -1,0 +1,32 @@
+<%- include('layout') %>
+
+<div class="container">
+    <h1 class="mt-4">Modifier l'Étudiant</h1>
+    <form action="/students/<%= student.id %>/edit?_method=PUT" method="POST">
+        <div class="form-group">
+            <label for="firstname">Prénom</label>
+            <input type="text" class="form-control" id="firstname" name="firstname" value="<%= user.firstname %>" required>
+        </div>
+        <div class="form-group">
+            <label for="lastname">Nom</label>
+            <input type="text" class="form-control" id="lastname" name="lastname" value="<%= user.lastname %>" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="<%= user.email %>" required>
+        </div>
+        <div class="form-group">
+            <label for="promotion_id">Promotion</label>
+            <select name="promotion_id" id="promotion_id" class="form-control">
+                <option value="">Aucune</option>
+                <% promotions.forEach(promotion => { %>
+                    <option value="<%= promotion.id %>" <%= student.promotion_id === promotion.id ? 'selected' : '' %>>
+                        <%= promotion.name %> - <%= promotion.year %>
+                    </option>
+                <% }); %>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a href="/students" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>

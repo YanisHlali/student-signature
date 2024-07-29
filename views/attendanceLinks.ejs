@@ -1,0 +1,27 @@
+<%- include('layout') %>
+
+<div class="container mt-4">
+  <h2>Liens pour la Signature de Présence</h2>
+  <p>Promotion: <%= promotion.name %> (<%= promotion.year %>)</p>
+  <p>Cours: <%= course.subject_name %></p>
+  <p>Date: <%= classe.day %> de <%= classe.start %> à <%= classe.end %></p>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Étudiant</th>
+        <th>Lien de Signature</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% links.forEach(link => { %>
+        <% if (link.student.user_id === userId) { %>
+          <tr>
+            <td><%= link.student.firstname %> <%= link.student.lastname %></td>
+            <td><a href="<%= link.link %>" class="btn btn-primary">Signer</a></td>
+          </tr>
+        <% } %>
+      <% }) %>
+    </tbody>
+  </table>
+</div>

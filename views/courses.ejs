@@ -1,0 +1,43 @@
+<%- include('layout') %>
+
+<header class="bg-dark text-white text-center py-3 mb-4">
+    <h1>Liste des Cours</h1>
+</header>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mt-4">Cours</h2>
+        <a href="/courses/create" class="btn btn-primary">Créer un cours</a>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Professeur</th>
+                <th>Sujet</th>
+                <th>Promotion</th>
+                <th>Début</th>
+                <th>Fin</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% courses.forEach(course => { %>
+            <tr>
+                <td><%= course.user_firstname %> <%= course.user_lastname %></td>
+                <td><%= course.subject_name %></td>
+                <td><%= course.promotion_name %> (<%= course.promotion_year %>)</td>
+                <td><%= course.class_start %></td>
+                <td><%= course.class_end %></td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a href="/courses/<%= course.id %>/edit" class="btn btn-warning btn-sm">Modifier</a>
+                        <form action="/courses/<%= course.id %>/delete?_method=DELETE" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                        </form>
+                        <a href="/attendances/<%= course.id %>" class="btn btn-info btn-sm">Liste de présence</a>
+                    </div>
+                </td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>

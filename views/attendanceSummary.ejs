@@ -1,0 +1,29 @@
+<%- include('layout') %>
+
+<header class="bg-dark text-white text-center py-3 mb-4">
+    <h1>Résumé des Présences</h1>
+</header>
+<div class="container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Cours</th>
+                <th>Promotion</th>
+                <th>Total Étudiants</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% summary.forEach(item => { %>
+                <tr>
+                    <td><%= item.subject_name %></td>
+                    <td><%= item.promotion_name %></td>
+                    <td><%= item.total_students %></td>
+                    <td>
+                        <a href="/attendances/classe/<%= item.id %>" class="btn btn-primary btn-sm">Voir Détails</a>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>

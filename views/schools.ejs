@@ -1,0 +1,43 @@
+<%- include('layout') %>
+
+<header class="bg-dark text-white text-center py-3 mb-4">
+  <h1>Liste des Écoles</h1>
+</header>
+<div class="container">
+  <a href="/schools/create" class="btn btn-primary mb-3">Ajouter une École</a>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Ville</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% schools.forEach(school => { %>
+      <tr>
+        <td><%= school.name %></td>
+        <td><%= school.city %></td>
+        <td>
+          <a
+            href="/schools/<%= school.id %>/edit?_method=PUT"
+            class="btn btn-warning"
+            >Modifier</a
+          >
+          <form
+            action="/schools/<%= school.id %>/delete?_method=DELETE"
+            method="POST"
+            style="display: inline"
+          >
+            <button type="submit" class="btn btn-danger">Supprimer</button>
+          </form>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

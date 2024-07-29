@@ -1,0 +1,29 @@
+<%- include('layout') %>
+
+<div class="container mt-4">
+  <h2>Présences pour la Classe</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Prénom</th>
+        <th>Nom</th>
+        <% if (userRole === 'professor' || userRole === 'admin') { %>
+          <th>Présent</th>
+        <% } %>
+      </tr>
+    </thead>
+    <tbody>
+      <% attendance.forEach(record => { %>
+        <tr>
+          <td><%= record.firstname %></td>
+          <td><%= record.lastname %></td>
+          <% if (userRole === 'professor' || userRole === 'admin') { %>
+            <td>
+              <input type="checkbox" <%= record.present ? 'checked' : '' %> disabled>
+            </td>
+          <% } %>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>

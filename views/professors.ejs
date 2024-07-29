@@ -1,0 +1,40 @@
+<%- include('layout') %>
+
+<header class="bg-dark text-white text-center py-3 mb-4">
+    <h1>Liste des Professeurs</h1>
+</header>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mt-4">Professeurs</h2>
+        <div>
+            <a href="/professors/create" class="btn btn-primary">Créer un Professeur</a>
+        </div>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% professors.forEach(professor => { %>
+            <tr>
+                <td><%= professor.firstname %></td>
+                <td><%= professor.lastname %></td>
+                <td><%= professor.email %></td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a href="/professors/<%= professor.id %>/edit" class="btn btn-warning btn-sm">Modifier</a>
+                        <form action="/professors/<%= professor.id %>/delete?_method=DELETE" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
