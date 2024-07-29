@@ -31,13 +31,30 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-  User.getUserById(id, (err, userResults) => {
+  User.getUserById(id, async (err, userResults) => {
     if (err) {
       return done(err);
     }
     const user = userResults[0];
-    done(null, user);
+    if (!user) {
+      return done(null, false);
+    }
+
+    try {
+      const roles = await new Promise((resolve, reject) => {
+        User.getUserRoles(id, (err, roleResults) => {
+          if (err) return reject(err);
+          resolve(roleResults);
+        });
+      });
+      user.roles = roles.map(role => role.name);
+      console.log("User roles:", user.roles);
+      done(null, user);
+    } catch (error) {
+      done(error, false);
+    }
   });
 });
+
 
 module.exports = passport;

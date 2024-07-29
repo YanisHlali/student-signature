@@ -40,8 +40,6 @@ async function getAllCourses(req, res) {
             course.class_end = new Date(course.class_end).toLocaleString();
         }
 
-        console.log({ courses, professors, subjects, promotions });
-
         res.render('courses', { courses, professors, subjects, promotions });
     } catch (err) {
         res.status(500).json(err);
@@ -57,7 +55,6 @@ async function getCourseById(req, res) {
 
 async function createCourse(req, res) {
     if (req.method === 'GET') {
-        // Fetch data for the form
         const professors = await new Promise((resolve, reject) => {
             User.getAllProfessors((err, professors) => {
                 if (err) return reject(err);

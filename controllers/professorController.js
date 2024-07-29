@@ -23,7 +23,6 @@ async function createProfessor(req, res) {
       User.createUser(newUser, (err, user) => {
         if (err) res.status(500).json(err);
         else {
-          // get id of the newly created user
           const userId = user.insertId;
           User.assignRole(userId, 3, (err, result) => {
             if (err) res.status(500).json(err);
@@ -61,7 +60,6 @@ async function deleteProfessor(req, res) {
     const professorId = req.params.id;
 
     try {
-        // Supprimer les cours associés au professeur
         await new Promise((resolve, reject) => {
             Course.deleteByProfessorId(professorId, (err, result) => {
                 if (err) return reject(err);
@@ -69,7 +67,6 @@ async function deleteProfessor(req, res) {
             });
         });
 
-        // Supprimer le professeur
         await new Promise((resolve, reject) => {
             User.deleteUser(professorId, (err, result) => {
                 if (err) return reject(err);

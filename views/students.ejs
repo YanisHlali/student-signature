@@ -104,13 +104,11 @@
             table.appendChild(row);
         });
 
-        // Remove existing sort classes
         var headers = table.parentElement.getElementsByTagName("th");
         for (var i = 0; i < headers.length; i++) {
             headers[i].classList.remove("sort-asc", "sort-desc");
         }
 
-        // Add sort class to the current header
         var currentHeader =
             table.parentElement.getElementsByTagName("th")[columnIndex];
         currentHeader.classList.add(isAscending ? "sort-asc" : "sort-desc");

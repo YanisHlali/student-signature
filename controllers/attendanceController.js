@@ -8,7 +8,7 @@ const crypto = require('crypto');
 async function generateAttendanceLinks(req, res) {
   try {
     const { classeId } = req.params;
-    const userId = req.user.id; // Récupérer l'ID de l'utilisateur connecté
+    const userId = req.user.id;
 
     const classe = await new Promise((resolve, reject) => {
       Classe.getClasseById(classeId, (err, classe) => {
@@ -93,9 +93,10 @@ async function generateAttendanceLinks(req, res) {
     classe.start = formatTime(classe.start);
     classe.end = formatTime(classe.end);
 
-    console.log({ links, classe, course, promotion });
+    let filteredLinks = links;
+    filteredLinks = links.filter(link => link.student.user_id === userId);
 
-    res.render('attendanceLinks', { links, classe, course, promotion, userId });
+    res.render('attendanceLinks', { links: filteredLinks, classe, course, promotion, user: req.user });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -195,6 +196,8 @@ async function getAttendanceByCourse(req, res) {
       }
     });
 
+    console.log(uniqueAttendance);
+
     res.render('attendanceByCourse', { attendance: uniqueAttendance });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -221,22 +224,79 @@ async function getAttendanceByClass(req, res) {
       }
     });
 
-    // Ajout du userRole
-    const userRole = req.user.is_admin ? 'admin' : (req.user.is_professor ? 'professor' : 'student');
-
-    console.log({ attendance: uniqueAttendance, user: req.user, userRole });
-
-    res.render('attendanceByClass', { attendance: uniqueAttendance, user: req.user, userRole });
+    res.render('attendanceByClass', { attendance: uniqueAttendance, user: req.user });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 }
 
+async function generateAttendanceLinksForClass(req, res) {
+  try {
+    const { classId } = req.params;
+    const userId = req.user.id;
 
+    const classe = await new Promise((resolve, reject) => {
+      Classe.getClasseById(classId, (err, classe) => {
+        if (err) return reject(err);
+        resolve(classe[0]);
+      });
+    });
+
+    if (!classe) {
+      return res.status(404).send('Class not found');
+    }
+
+    const students = await new Promise((resolve, reject) => {
+      Student.getStudentsByPromotionId(classe.promotion_id, (err, students) => {
+        if (err) return reject(err);
+        resolve(students);
+      });
+    });
+
+    if (!students || students.length === 0) {
+      return res.status(404).send('No students found for this promotion');
+    }
+
+    const links = await Promise.all(students.map(async (student) => {
+      const token = crypto.randomBytes(16).toString('hex');
+      const expiryTime = new Date(classe.end);
+
+      const studentIdResult = await new Promise((resolve, reject) => {
+        Student.getStudentIdByUserId(student.user_id, (err, result) => {
+          if (err) return reject(err);
+          resolve(result[0]);
+        });
+      });
+
+      const studentId = studentIdResult ? studentIdResult.id : null;
+
+      if (!studentId) {
+        throw new Error('Student ID not found');
+      }
+
+      await new Promise((resolve, reject) => {
+        Attendance.createAttendanceToken(token, studentId, classId, expiryTime, (err) => {
+          if (err) return reject(err);
+          resolve();
+        });
+      });
+
+      return {
+        student,
+        link: `${req.protocol}://${req.get('host')}/attendances/sign?token=${token}`
+      };
+    }));
+
+    res.render('attendanceByClass', { links, user: req.user });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
 
 module.exports = {
   generateAttendanceLinks,
   signAttendance,
   getAttendanceByCourse,
-  getAttendanceByClass
+  getAttendanceByClass,
+  generateAttendanceLinksForClass
 };

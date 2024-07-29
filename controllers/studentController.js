@@ -60,26 +60,44 @@ async function getStudentById(req, res) {
 
 async function createStudent(req, res) {
     if (req.method === 'GET') {
-        Promotion.getAllPromotions((err, promotions) => {
-            if (err) res.status(500).send(err);
-            else res.render('createStudent', { promotions });
-        });
+      Promotion.getAllPromotions((err, promotions) => {
+        if (err) res.status(500).send(err);
+        else res.render('createStudent', { promotions });
+      });
     } else if (req.method === 'POST') {
-        const { firstname, lastname, email, password, promotion_id } = req.body;
-
-        User.createUser({ firstname, lastname, email, password }, (err, user) => {
-            if (err) res.status(500).json(err);
-            else {
-                Student.createStudent({ user_id: user.insertId, promotion_id }, (err, student) => {
-                    if (err) res.status(500).json(err);
-                    else res.redirect('/students');
-                });
-            }
+      const { firstname, lastname, email, password, promotion_id } = req.body;
+  
+      try {
+        const user = await new Promise((resolve, reject) => {
+          User.createUser({ firstname, lastname, email, password }, (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+          });
         });
+  
+        const student = await new Promise((resolve, reject) => {
+          Student.createStudent({ user_id: user.insertId, promotion_id }, (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+          });
+        });
+  
+        const role = await new Promise((resolve, reject) => {
+          User.assignRole(user.insertId, 2, (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+          });
+        });
+  
+        res.redirect('/students');
+      } catch (err) {
+        res.status(500).json(err);
+      }
     } else {
-        res.status(405).end();
+      res.status(405).end();
     }
-}
+  }
+  
 
 async function updateStudent(req, res) {
     if (req.method === 'GET') {
@@ -176,6 +194,13 @@ async function unassignPromotion(req, res) {
         }
 
         const promotionId = student.promotion_id;
+
+        await new Promise((resolve, reject) => {
+            Student.deleteAttendanceByStudentId(id, (err) => {
+                if (err) return reject(err);
+                resolve();
+            });
+        });
 
         Student.deleteStudent(id, (err, result) => {
             if (err) {

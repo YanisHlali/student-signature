@@ -15,8 +15,9 @@ class Student {
   }
 
   static getStudentById(id, callback) {
-    db.query('SELECT * FROM student WHERE id = ?', [id], callback);
-}
+    const sql = 'SELECT * FROM student WHERE id = ?';
+    db.query(sql, [id], callback);
+  }
 
   static createStudent(newStudent, callback) {
     db.query('INSERT INTO student SET ?', newStudent, callback);
@@ -26,8 +27,14 @@ class Student {
     db.query('UPDATE student SET ? WHERE id = ?', [updatedStudent, id], callback);
   }
 
-  static deleteStudent(id, callback) {
-    db.query('DELETE FROM student WHERE id = ?', [id], callback);
+  static deleteStudent(studentId, callback) {
+    const sql = 'DELETE FROM student WHERE id = ?';
+    db.query(sql, [studentId], callback);
+  }
+
+  static deleteAttendanceByStudentId(studentId, callback) {
+    const sql = 'DELETE FROM attendance WHERE student_id = ?';
+    db.query(sql, [studentId], callback);
   }
 
   static getStudentsByPromotionId(promotionId, callback) {

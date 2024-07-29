@@ -15,7 +15,7 @@
     </thead>
     <tbody>
       <% links.forEach(link => { %>
-        <% if (link.student.user_id === userId) { %>
+        <% if (link.student.user_id === user.id) { %>
           <tr>
             <td><%= link.student.firstname %> <%= link.student.lastname %></td>
             <td><a href="<%= link.link %>" class="btn btn-primary">Signer</a></td>

@@ -6,6 +6,6 @@ const { ensureAuthenticated } = require('../middlewares/authMiddleware');
 router.get('/generate/:classeId', attendanceController.generateAttendanceLinks);
 router.get('/sign', attendanceController.signAttendance);
 router.get('/:courseId', attendanceController.getAttendanceByCourse);
-router.get('/class/:classId', attendanceController.getAttendanceByClass);
+router.get('/class/:classId', attendanceController.generateAttendanceLinksForClass);
 
 module.exports = router;

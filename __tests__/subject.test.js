@@ -3,7 +3,6 @@ const app = require("../server");
 const Subject = require("../models/Student");
 
 describe("Subjects API", () => {
-  // Create a random number id for testing (between 123456789 and 987654321)
   const testId = Math.floor(Math.random() * (987654321 - 123456789) + 123456789);
 
   it("should create a new subject with an id of " + testId, async () => {

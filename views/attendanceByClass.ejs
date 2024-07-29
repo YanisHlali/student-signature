@@ -7,21 +7,19 @@
       <tr>
         <th>Prénom</th>
         <th>Nom</th>
-        <% if (userRole === 'professor' || userRole === 'admin') { %>
-          <th>Présent</th>
-        <% } %>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody>
-      <% attendance.forEach(record => { %>
+      <% links.forEach(link => { %>
         <tr>
-          <td><%= record.firstname %></td>
-          <td><%= record.lastname %></td>
-          <% if (userRole === 'professor' || userRole === 'admin') { %>
-            <td>
-              <input type="checkbox" <%= record.present ? 'checked' : '' %> disabled>
-            </td>
-          <% } %>
+          <td><%= link.student.firstname %></td>
+          <td><%= link.student.lastname %></td>
+          <td>
+            <% if (user.id === link.student.user_id) { %>
+              <a href="<%= link.link %>" class="btn btn-primary">Signer</a>
+            <% } %>
+          </td>
         </tr>
       <% }) %>
     </tbody>
