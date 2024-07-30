@@ -61,6 +61,18 @@ router.get('/logout', (req, res) => {
   });
 });
 
+router.get('/test', (req, res) => {
+  bcrypt.genSalt(10)
+    .then(salt => {
+      return bcrypt.hash("toto", salt);
+    })
+    .then(hash => {
+      res.send(hash);
+    })
+    .catch(err => {
+      res.status(500).send(err.message);
+    });
+});
 
 
 module.exports = router;

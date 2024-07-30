@@ -7,7 +7,9 @@
       <tr>
         <th>Prénom</th>
         <th>Nom</th>
+        <% if (role === 'ROLE_PROF') { %>
         <th>Action</th>
+        <% } %>
       </tr>
     </thead>
     <tbody>
@@ -15,11 +17,13 @@
         <tr>
           <td><%= link.student.firstname %></td>
           <td><%= link.student.lastname %></td>
+          <% if (role === 'ROLE_PROF') { %>
           <td>
             <% if (user.id === link.student.user_id) { %>
               <a href="<%= link.link %>" class="btn btn-primary">Signer</a>
             <% } %>
           </td>
+          <% } %>
         </tr>
       <% }) %>
     </tbody>

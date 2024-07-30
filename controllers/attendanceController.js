@@ -234,6 +234,7 @@ async function generateAttendanceLinksForClass(req, res) {
   try {
     const { classId } = req.params;
     const userId = req.user.id;
+    const role = req.user.roles;
 
     const classe = await new Promise((resolve, reject) => {
       Classe.getClasseById(classId, (err, classe) => {
@@ -287,7 +288,9 @@ async function generateAttendanceLinksForClass(req, res) {
       };
     }));
 
-    res.render('attendanceByClass', { links, user: req.user });
+    console.log(links);
+
+    res.render('attendanceByClass', { links, user: req.user, role });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
