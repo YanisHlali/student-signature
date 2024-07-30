@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '.env', override: true });
+require('dotenv').config({ path: '.env.local', override: true });
 const mysql = require('mysql2');
 
 const connection = mysql.createConnection({
@@ -8,7 +8,6 @@ const connection = mysql.createConnection({
   database: process.env.DB_DATABASE,
 });
 
-console.log(process.env.DB_HOST);
 connection.connect((err) => {
   if (err) {
     console.error('Erreur de connexion : ' + err.stack);
