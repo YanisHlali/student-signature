@@ -13,16 +13,16 @@
           <%= messages.error %>
         </div>
       <% } %>
-      <form action="/auth/login" method="POST" >
-        <div>
+      <form action="/auth/login" method="POST" style="display: flex; flex-direction: column;">
+        
           <label for="email">Identifiant :</label>
-          <input type="email" name="email" id="email" required>
-        </div>
-        <div>
+          <input type="email" name="email" id="email"  required>
+        
+        
           <label for="password">Mot de passe : </label>
           <input type="password" name="password" id="password" required>
-        </div>
-        <button type="submit">Login</button>
+        
+        <button class="btn btn-dark" style="margin-top: 3px;" type="submit">Login</button>
       </form>
     </div>
   </div>
