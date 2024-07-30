@@ -7,7 +7,7 @@ class Classe {
              promotion.name as promotion_name, promotion.year as promotion_year,
              course.subject_id, course.user_id,
              subject.name as subject_name,
-             user.firstname as user_firstname, user.lastname as user_lastname
+             user.firstname as prof_firstname, user.lastname as prof_lastname
       FROM classe
       LEFT JOIN promotion ON classe.promotion_id = promotion.id
       LEFT JOIN course ON classe.course_id = course.id

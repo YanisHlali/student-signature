@@ -1,35 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register</title>
-</head>
-<body>
-  <h1>Register</h1>
+<%- include('layout') %>
+
+<body style=" height: 100vh ;" >
   <% if (messages.error) { %>
     <div>
       <%= messages.error %>
     </div>
   <% } %>
-  <form action="/auth/register" method="POST">
-    <div>
-      <label for="firstname">First Name</label>
-      <input type="text" name="firstname" id="firstname" required>
-    </div>
-    <div>
-      <label for="lastname">Last Name</label>
-      <input type="text" name="lastname" id="lastname" required>
-    </div>
-    <div>
-      <label for="email">Email</label>
-      <input type="email" name="email" id="email" required>
-    </div>
-    <div>
-      <label for="password">Password</label>
-      <input type="password" name="password" id="password" required>
-    </div>
-    <button type="submit">Register</button>
+  <form action="/auth/register" method="POST"  >
+    <div style=" height: 100vh ; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h2>Créer un compte</h2>
+
+        <label for="firstname">Prénom :</label>
+        <input type="text" name="firstname" id="firstname" required>
+    
+        <label for="lastname">Nom de famille : </label>
+        <input type="text" name="lastname" id="lastname" required>
+    
+        <label for="email">E-mail :</label>
+        <input type="email" name="email" id="email" required>
+    
+        <label for="password">Mot de passe :</label>
+        <input type="password" name="password" id="password" required>
+      
+      <button  style="margin-top: 5px;" class="btn btn-dark " type="submit">Créer mon compte </button>
+      </div>
   </form>
 </body>
-</html>

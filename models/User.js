@@ -90,12 +90,6 @@ class User {
       JOIN user_role ON role.id = user_role.role_id
       WHERE user_role.user_id = ?
     `;
-    console.log(`
-      SELECT role.name
-      FROM role
-      JOIN user_role ON role.id = user_role.role_id
-      WHERE user_role.user_id = ${userId}
-    `)
     db.query(sql, [userId], callback);
   }
 }

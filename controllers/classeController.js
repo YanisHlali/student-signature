@@ -6,6 +6,7 @@ const Course = require('../models/Course');
 
 async function getAllClasses(req, res) {
   Classe.getAllClasses((err, classes) => {
+    console.log(classes);
     if (err) res.status(500).json(err);
     else res.render('classes', { classes });
   });
