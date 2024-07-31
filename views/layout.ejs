@@ -52,6 +52,7 @@
             <span class="navbar-text ml-auto navbar-text-custom">
                 <% if (user) { %>
                     Connecté en tant que: <strong><%= user.firstname %> <%= user.lastname %></strong>
+                    <a href="/auth/logout"><button class="btn btn-danger">Se deconnecter</button></a>
                 <% } else { %>
                     Non connecté
                 <% } %>
