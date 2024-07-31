@@ -35,7 +35,7 @@
                 <td>
                     <div class="btn-group" role="group">
                         <a href="/students/<%= student.id %>/edit" class="btn btn-warning btn-sm">Modifier</a>
-                        <form action="/students/<%= student.id %>/delete?_method=DELETE" method="POST" style="display: inline;">
+                        <form action="/students/<%= student.id %>/delete?_method=DELETE" method="POST" style="display: inline;  margin-left: 3px;">
                             <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
                         </form>
                     </div>
@@ -73,7 +73,7 @@
                         </form>
                         <div class="btn-group" role="group">
                             <a href="/users/<%= student.id %>/edit" class="btn btn-warning btn-sm">Modifier</a>
-                            <form action="/users/<%= student.id %>/delete?_method=DELETE" method="POST" style="display: inline;">
+                            <form action="/users/<%= student.id %>/delete?_method=DELETE" method="POST" style="display: inline; margin-left: 3px;">
                                 <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
                             </form>
                         </div>
