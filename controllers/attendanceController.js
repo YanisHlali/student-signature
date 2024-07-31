@@ -327,42 +327,6 @@ async function generateAttendanceLinksForClass(req, res) {
   }
 }
 
-async function redirectAttendance(req, res) {
-  try {
-    const { classId } = req.params;
-    const userId = req.user.id;
-
-    const userRoles = await new Promise((resolve, reject) => {
-      User.getUserRoles(userId, (err, roles) => {
-        if (err) return reject(err);
-        resolve(roles);
-      });
-    });
-
-    const isProfessor = userRoles.some(role => role.name === 'ROLE_PROF');
-
-    if (isProfessor) {
-      console.log(isProfessor)
-      const classe = await new Promise((resolve, reject) => {
-        Classe.getClasseById(classId, (err, classe) => {
-          if (err) return reject(err);
-          resolve(classe[0]);
-        });
-      });
-
-      if (!classe) {
-        return res.status(404).send('Class not found');
-      }
-
-      return res.redirect(`/attendances/${classe.course_id}`);
-    } else {
-      return res.redirect(`/attendances/generate/${classId}`);
-    }
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
-
 module.exports = {
   generateAttendanceLinks,
   signAttendance,
