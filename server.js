@@ -36,6 +36,7 @@ app.use((req, res, next) => {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+
 const authRoutes = require('./routes/authRoutes');
 const promotionRoutes = require('./routes/promotionRoutes');
 const courseRoutes = require('./routes/courseRoutes');
@@ -48,6 +49,7 @@ const userRoutes = require('./routes/userRoutes');
 const professorRoutes = require('./routes/professorRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 
+app.use('/', promotionRoutes)
 app.use('/auth', authRoutes);
 app.use('/promotions', ensureAuthenticated, promotionRoutes);
 app.use('/courses', ensureAuthenticated, roleMiddleware(['ROLE_ADMIN', 'ROLE_PROF']), courseRoutes);
