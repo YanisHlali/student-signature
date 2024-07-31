@@ -1,7 +1,7 @@
 {
   "scripts": {
     "start": "node server.js",
-    "test": "jest --forceExit"
+    "test": "jest --forceExit --coverage"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.14",
