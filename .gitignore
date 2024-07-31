@@ -1,3 +1,7 @@
 node_modules
 .env.local
+<<<<<<< HEAD
 .vercel
+=======
+coverage
+>>>>>>> 3a17ec10589cfbb2a9f7e3e25cf7f2553417ec4c
