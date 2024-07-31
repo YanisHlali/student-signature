@@ -4,6 +4,7 @@
     <h1>Liste des Étudiants</h1>
 </header>
 <div class="container">
+    <% if (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_PROF')) { %>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mt-4">Étudiants avec Promotion</h2>
         <div>
@@ -11,6 +12,7 @@
             <a href="/users/create" class="btn btn-secondary">Créer un étudiant sans promotion</a>
         </div>
     </div>
+    <% } %>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -33,12 +35,14 @@
                 <td><%= student.schoolName %></td>
                 <td><%= student.schoolCity %></td>
                 <td>
+                    <% if (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_PROF')) { %>
                     <div class="btn-group" role="group">
                         <a href="/students/<%= student.id %>/edit" class="btn btn-warning btn-sm">Modifier</a>
                         <form action="/students/<%= student.id %>/delete?_method=DELETE" method="POST" style="display: inline;  margin-left: 3px;">
                             <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
                         </form>
                     </div>
+                    <% } %>
                 </td>
             </tr>
             <% }); %>
@@ -60,6 +64,7 @@
                 <td><%= student.firstname %></td>
                 <td><%= student.lastname %></td>
                 <td>
+                    <% if (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_PROF')) { %>
                     <div class="d-flex align-items-center">
                         <form action="/students/assign-promotion/<%= student.id %>" method="POST" class="form-inline mr-2">
                             <div class="form-group">
@@ -78,6 +83,7 @@
                             </form>
                         </div>
                     </div>
+                    <% } %>
                 </td>
             </tr>
             <% }); %>

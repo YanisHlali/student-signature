@@ -5,6 +5,10 @@ const Student = require('../models/Student');
 const Promotion = require('../models/Promotion');
 const User = require('../models/User');
 const crypto = require('crypto');
+const { DateTime } = require('luxon'); 
+const { promisify } = require('util');
+
+const randomBytesAsync = promisify(crypto.randomBytes);
 
 async function generateAttendanceLinks(req, res) {
   try {
@@ -56,8 +60,8 @@ async function generateAttendanceLinks(req, res) {
     }
 
     const links = await Promise.all(students.map(async (student) => {
-      const token = crypto.randomBytes(16).toString('hex');
-      const expiryTime = new Date(classe.end);
+      const token = (await randomBytesAsync(16)).toString('hex');
+      const expiryTime = DateTime.now().plus({ hours: 24 }).toJSDate();
 
       const studentIdResult = await new Promise((resolve, reject) => {
         Student.getStudentIdByUserId(student.user_id, (err, result) => {
@@ -72,7 +76,6 @@ async function generateAttendanceLinks(req, res) {
         throw new Error('Student ID not found');
       }
 
-      // Vérifier si l'utilisateur a déjà signé la présence
       const hasSigned = await new Promise((resolve, reject) => {
         Attendance.checkAttendance(studentId, classeId, (err, result) => {
           if (err) return reject(err);
@@ -80,7 +83,13 @@ async function generateAttendanceLinks(req, res) {
         });
       });
 
-      // Inclure l'information si l'utilisateur a signé la présence
+      await new Promise((resolve, reject) => {
+        Attendance.createAttendanceToken(token, studentId, classeId, expiryTime, (err) => {
+          if (err) return reject(err);
+          resolve();
+        });
+      });
+
       return {
         student,
         link: `${req.protocol}://${req.get('host')}/attendances/sign?token=${token}`,
@@ -110,11 +119,10 @@ async function generateAttendanceLinks(req, res) {
 async function redirectAttendance(req, res) {
   try {
     const { classId } = req.params;
-    const userId = req.user.id;
 
     const userRoles = req.user.roles;
 
-    if (userRoles.includes('ROLE_PROF')) {
+    if (userRoles.includes('ROLE_PROF') || userRoles.includes('ROLE_ADMIN')) {
       const classe = await new Promise((resolve, reject) => {
         Classe.getClasseById(classId, (err, classe) => {
           if (err) return reject(err);
@@ -154,6 +162,10 @@ async function signAttendance(req, res) {
       return res.status(400).send('Invalid or expired token');
     }
 
+    if (new Date(tokenData.expiryTime) < new Date()) {
+      return res.status(400).send('Token has expired');
+    }
+
     if (userRole === 'student') {
       const studentIdResult = await new Promise((resolve, reject) => {
         Student.getStudentIdByUserId(userId, (err, result) => {
@@ -174,11 +186,12 @@ async function signAttendance(req, res) {
       });
     });
 
-    res.send('Attendance successfully signed');
+    res.redirect("/promotions");
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 }
+
 
 async function getAttendanceByCourse(req, res) {
   const { courseId } = req.params;

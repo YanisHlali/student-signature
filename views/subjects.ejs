@@ -4,7 +4,9 @@
   <h1>Liste des Matières</h1>
 </header>
 <div class="container">
-  <a href="/subjects/create" class="btn btn-primary mb-3">Créer une Matière</a>
+  <% if (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_PROF')) { %>
+    <a href="/subjects/create" class="btn btn-primary mb-3">Créer une Matière</a>
+  <% } %>
   <table class="table table-striped">
     <thead>
       <tr>
@@ -17,20 +19,12 @@
       <tr>
         <td><%= subject.name %></td>
         <td>
-          <a
-            href="/subjects/<%= subject.id %>/edit"
-            class="btn btn-warning btn-sm"
-            >Modifier</a
-          >
-          <form
-            action="/subjects/<%= subject.id %>/delete?_method=DELETE"
-            method="POST"
-            style="display: inline"
-          >
-            <button type="submit" class="btn btn-danger btn-sm">
-              Supprimer
-            </button>
-          </form>
+          <% if (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_PROF')) { %>
+            <a href="/subjects/<%= subject.id %>/edit" class="btn btn-warning btn-sm">Modifier</a>
+            <form action="/subjects/<%= subject.id %>/delete?_method=DELETE" method="POST" style="display: inline">
+              <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+            </form>
+          <% } %>
         </td>
       </tr>
       <% }); %>

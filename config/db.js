@@ -13,7 +13,7 @@ connection.connect((err) => {
     console.error('Erreur de connexion : ' + err.stack);
     return;
   }
-  console.log('Connecté en tant que id ' + connection.threadId);
+  console.log('Connecté à la base de données MySQL');
 });
 
 module.exports = connection;

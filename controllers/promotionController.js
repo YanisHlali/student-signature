@@ -145,6 +145,14 @@ async function getPromotionScheduleById(req, res) {
                 });
             });
 
+            console.log({
+                ...classe,
+                subject_name: subject ? subject.name : 'Unknown',
+                teacher_name: teacher ? `${teacher.firstname} ${teacher.lastname}` : 'Unknown',
+                start: new Date(classe.start),
+                end: new Date(classe.end)
+            })
+
             return {
                 ...classe,
                 subject_name: subject ? subject.name : 'Unknown',
