@@ -91,7 +91,15 @@ async function createStudent(req, res) {
   
         res.redirect('/students');
       } catch (err) {
-        res.status(500).json(err);
+        if (err.code === 'ER_DUP_ENTRY') {
+          res.status(400).json({
+            error: 'Duplicate entry',
+            message: 'An account with this email already exists.',
+            details: err.sqlMessage
+          });
+        } else {
+          res.status(500).json({ error: err.message });
+        }
       }
     } else {
       res.status(405).end();

@@ -143,8 +143,6 @@ async function redirectAttendance(req, res) {
   }
 }
 
-
-
 async function signAttendance(req, res) {
   try {
     const { token } = req.query;
@@ -186,12 +184,11 @@ async function signAttendance(req, res) {
       });
     });
 
-    res.redirect("/promotions");
+    res.redirect(`/attendances/generate/${tokenData.classe_id}`);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 }
-
 
 async function getAttendanceByCourse(req, res) {
   const { courseId } = req.params;
