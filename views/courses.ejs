@@ -6,7 +6,9 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mt-4">Cours</h2>
-        <a href="/courses/create" class="btn btn-primary">Créer un cours</a>
+        <% if (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_PROF')) { %>
+            <a href="/courses/create" class="btn btn-primary">Créer un cours</a>
+        <% } %>
     </div>
     <table class="table table-striped">
         <thead>
@@ -29,10 +31,12 @@
                 <td><%= course.class_end %></td>
                 <td>
                     <div class="btn-group" role="group">
-                        <a href="/courses/<%= course.id %>/edit" class="btn btn-warning btn-sm">Modifier</a>
-                        <form action="/courses/<%= course.id %>/delete?_method=DELETE" method="POST" style="display: inline;">
-                            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
-                        </form>
+                        <% if (user.roles.includes('ROLE_ADMIN') || (user.roles.includes('ROLE_PROF') && course.user_id === user.id)) { %>
+                            <a href="/courses/<%= course.id %>/edit" class="btn btn-warning btn-sm">Modifier</a>
+                            <form action="/courses/<%= course.id %>/delete?_method=DELETE" method="POST" style="display: inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                            </form>
+                        <% } %>
                         <a href="/attendances/<%= course.id %>" class="btn btn-info btn-sm">Liste de présence</a>
                     </div>
                 </td>

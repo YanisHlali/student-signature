@@ -4,9 +4,11 @@
     <h1>Liste des Promotions</h1>
 </header>
 <div class="container">
-    <div class="d-flex justify-content-end mb-4">
-        <a href="/promotions/create" class="btn btn-success">Ajouter une Promotion</a>
-    </div>
+    <% if (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_PROF')) { %>
+        <div class="d-flex justify-content-end mb-4">
+            <a href="/promotions/create" class="btn btn-success">Ajouter une Promotion</a>
+        </div>
+    <% } %>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -25,10 +27,12 @@
                     <td>
                         <a href="/promotions/<%= promotion.id %>/schedule" class="btn btn-info">Voir emploi du temps</a>
                         <a href="/promotions/<%= promotion.id %>/students" class="btn btn-primary">Voir les étudiants</a>
-                        <a href="/promotions/<%= promotion.id %>/edit" class="btn btn-warning">Modifier</a>
-                        <form action="/promotions/<%= promotion.id %>/delete" method="POST" style="display:inline;">
-                            <button type="submit" class="btn btn-danger">Supprimer</button>
-                        </form>
+                        <% if (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_PROF')) { %>
+                            <a href="/promotions/<%= promotion.id %>/edit" class="btn btn-warning">Modifier</a>
+                            <form action="/promotions/<%= promotion.id %>/delete" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                            </form>
+                        <% } %>
                     </td>
                 </tr>
             <% }); %>

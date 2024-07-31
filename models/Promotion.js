@@ -24,6 +24,16 @@ class Promotion {
   static getPromotionById(id, callback) {
     db.query('SELECT * FROM promotion WHERE id = ?', [id], callback);
   }
+
+  static getPromotionsByStudentId(studentId, callback) {
+    const sql = `
+      SELECT p.* 
+      FROM promotion p
+      JOIN student s ON p.id = s.promotion_id
+      WHERE s.user_id = ?
+    `;
+    db.query(sql, [studentId], callback);
+  }
 }
 
 module.exports = Promotion;

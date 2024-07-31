@@ -3,6 +3,7 @@ const Course = require('../models/Course');
 const Classe = require('../models/Classe');
 const Student = require('../models/Student');
 const Promotion = require('../models/Promotion');
+const User = require('../models/User');
 const crypto = require('crypto');
 
 async function generateAttendanceLinks(req, res) {
@@ -71,16 +72,19 @@ async function generateAttendanceLinks(req, res) {
         throw new Error('Student ID not found');
       }
 
-      await new Promise((resolve, reject) => {
-        Attendance.createAttendanceToken(token, studentId, classeId, expiryTime, (err) => {
+      // Vérifier si l'utilisateur a déjà signé la présence
+      const hasSigned = await new Promise((resolve, reject) => {
+        Attendance.checkAttendance(studentId, classeId, (err, result) => {
           if (err) return reject(err);
-          resolve();
+          resolve(result);
         });
       });
 
+      // Inclure l'information si l'utilisateur a signé la présence
       return {
         student,
-        link: `${req.protocol}://${req.get('host')}/attendances/sign?token=${token}`
+        link: `${req.protocol}://${req.get('host')}/attendances/sign?token=${token}`,
+        hasSigned
       };
     }));
 
@@ -89,18 +93,49 @@ async function generateAttendanceLinks(req, res) {
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
 
+    const isPastCourse = new Date(classe.end) < new Date();
+
     classe.day = new Date(classe.start).toLocaleDateString();
     classe.start = formatTime(classe.start);
     classe.end = formatTime(classe.end);
 
-    let filteredLinks = links;
-    filteredLinks = links.filter(link => link.student.user_id === userId);
+    let filteredLinks = links.filter(link => link.student.user_id === userId);
 
-    res.render('attendanceLinks', { links: filteredLinks, classe, course, promotion, user: req.user });
+    res.render('attendanceLinks', { links: filteredLinks, classe, course, promotion, user: req.user, isPastCourse });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 }
+
+async function redirectAttendance(req, res) {
+  try {
+    const { classId } = req.params;
+    const userId = req.user.id;
+
+    const userRoles = req.user.roles;
+
+    if (userRoles.includes('ROLE_PROF')) {
+      const classe = await new Promise((resolve, reject) => {
+        Classe.getClasseById(classId, (err, classe) => {
+          if (err) return reject(err);
+          resolve(classe[0]);
+        });
+      });
+
+      if (!classe) {
+        return res.status(404).send('Class not found');
+      }
+
+      return res.redirect(`/attendances/${classe.course_id}`);
+    } else {
+      return res.redirect(`/attendances/generate/${classId}`);
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+
 
 async function signAttendance(req, res) {
   try {
@@ -196,8 +231,6 @@ async function getAttendanceByCourse(req, res) {
       }
     });
 
-    console.log(uniqueAttendance);
-
     res.render('attendanceByCourse', { attendance: uniqueAttendance });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -288,9 +321,43 @@ async function generateAttendanceLinksForClass(req, res) {
       };
     }));
 
-    console.log(links);
-
     res.render('attendanceByClass', { links, user: req.user, role });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+async function redirectAttendance(req, res) {
+  try {
+    const { classId } = req.params;
+    const userId = req.user.id;
+
+    const userRoles = await new Promise((resolve, reject) => {
+      User.getUserRoles(userId, (err, roles) => {
+        if (err) return reject(err);
+        resolve(roles);
+      });
+    });
+
+    const isProfessor = userRoles.some(role => role.name === 'ROLE_PROF');
+
+    if (isProfessor) {
+      console.log(isProfessor)
+      const classe = await new Promise((resolve, reject) => {
+        Classe.getClasseById(classId, (err, classe) => {
+          if (err) return reject(err);
+          resolve(classe[0]);
+        });
+      });
+
+      if (!classe) {
+        return res.status(404).send('Class not found');
+      }
+
+      return res.redirect(`/attendances/${classe.course_id}`);
+    } else {
+      return res.redirect(`/attendances/generate/${classId}`);
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -301,5 +368,6 @@ module.exports = {
   signAttendance,
   getAttendanceByCourse,
   getAttendanceByClass,
-  generateAttendanceLinksForClass
+  generateAttendanceLinksForClass,
+  redirectAttendance
 };

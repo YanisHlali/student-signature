@@ -82,11 +82,25 @@ class Course {
 
   static getCoursesByProfessor(professorId, callback) {
     const sql = `
-      SELECT course.*, subject.name as subject_name, promotion.name as promotion_name
+      SELECT 
+          course.id, 
+          course.user_id, 
+          course.subject_id, 
+          course.promotion_id, 
+          user.firstname as user_firstname, 
+          user.lastname as user_lastname, 
+          subject.name as subject_name, 
+          promotion.name as promotion_name, 
+          promotion.year as promotion_year,
+          classe.start as class_start,
+          classe.end as class_end
       FROM course
-      JOIN subject ON course.subject_id = subject.id
-      JOIN promotion ON course.promotion_id = promotion.id
+      LEFT JOIN user ON course.user_id = user.id
+      LEFT JOIN subject ON course.subject_id = subject.id
+      LEFT JOIN promotion ON course.promotion_id = promotion.id
+      LEFT JOIN classe ON course.id = classe.course_id
       WHERE course.user_id = ?
+      ORDER BY classe.start DESC
     `;
     db.query(sql, [professorId], callback);
   }

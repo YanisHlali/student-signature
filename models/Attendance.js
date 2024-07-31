@@ -66,6 +66,19 @@ class Attendance {
     `;
     db.query(sql, [classId], callback);
   }
+
+  static checkAttendance(studentId, classeId, callback) {
+    const sql = `
+      SELECT * FROM attendance
+      WHERE student_id = ? AND classe_id = ? AND present = 1
+    `;
+    db.query(sql, [studentId, classeId], (err, results) => {
+      if (err) {
+        return callback(err, null);
+      }
+      callback(null, results.length > 0);
+    });
+  }
 }
 
 module.exports = Attendance;

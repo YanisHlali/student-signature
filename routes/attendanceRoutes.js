@@ -7,5 +7,6 @@ router.get('/generate/:classeId', attendanceController.generateAttendanceLinks);
 router.get('/sign', attendanceController.signAttendance);
 router.get('/:courseId', attendanceController.getAttendanceByCourse);
 router.get('/class/:classId', attendanceController.generateAttendanceLinksForClass);
+router.get('/redirect/:classId', attendanceController.redirectAttendance);
 
 module.exports = router;

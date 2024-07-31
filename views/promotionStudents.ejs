@@ -1,7 +1,7 @@
 <%- include('layout') %>
 
 <header class="bg-dark text-white text-center py-3 mb-4">
-    <h1>Liste des Étudiants de la Promotion <%= promotion.name %></h1>
+    <h1>Liste des étudiants - <%= promotion.name %> (<%= promotion.year %>)</h1>
 </header>
 <div class="container">
     <table class="table table-striped">
@@ -10,7 +10,9 @@
                 <th>Prénom</th>
                 <th>Nom</th>
                 <th>Email</th>
-                <th>Actions</th>
+                <% if (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_PROF')) { %>
+                    <th>Actions</th>
+                <% } %>
             </tr>
         </thead>
         <tbody>
@@ -19,15 +21,17 @@
                     <td><%= student.firstname %></td>
                     <td><%= student.lastname %></td>
                     <td><%= student.email %></td>
-                    <td>
-                        <a href="/students/<%= student.id %>/edit" class="btn btn-warning btn-sm">Modifier</a>
-                        <form action="/students/<%= student.id %>/delete?_method=DELETE" method="POST" style="display:inline;">
-                            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
-                        </form>
-                        <form action="/students/unassign-promotion/<%= student.id %>" method="POST" style="display:inline;">
-                            <button type="submit" class="btn btn-secondary btn-sm">Désaffecter</button>
-                        </form>
-                    </td>
+                    <% if (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_PROF')) { %>
+                        <td>
+                            <a href="/students/<%= student.id %>/edit" class="btn btn-warning btn-sm">Modifier</a>
+                            <form action="/students/<%= student.id %>/delete?_method=DELETE" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                            </form>
+                            <form action="/students/unassign-promotion/<%= student.id %>" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-secondary btn-sm">Désaffecter</button>
+                            </form>
+                        </td>
+                    <% } %>
                 </tr>
             <% }); %>
         </tbody>

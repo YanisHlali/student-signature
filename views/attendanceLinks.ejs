@@ -6,22 +6,26 @@
   <p>Cours: <%= course.subject_name %></p>
   <p>Date: <%= classe.day %> de <%= classe.start %> à <%= classe.end %></p>
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Étudiant</th>
-        <th>Lien de Signature</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% links.forEach(link => { %>
-        <% if (link.student.user_id === user.id) { %>
-          <tr>
-            <td><%= link.student.firstname %> <%= link.student.lastname %></td>
-            <td><a href="<%= link.link %>" class="btn btn-primary">Signer</a></td>
-          </tr>
-        <% } %>
-      <% }) %>
-    </tbody>
-  </table>
+  <% links.forEach(link => { %>
+    <% if (link.student.user_id === user.id) { %>
+      <div class="card mt-4">
+        <div class="card-body">
+          <h5 class="card-title"><%= link.student.firstname %> <%= link.student.lastname %></h5>
+          <p class="card-text">
+            <% if (!isPastCourse) { %>
+              <% if (!link.hasSigned) { %>
+                <a href="<%= link.link %>" class="btn btn-primary">Signer</a>
+                <span class="badge bg-warning text-dark">Non signé</span>
+              <% } else { %>
+                <a href="<%= link.link %>" class="btn btn-secondary disabled" tabindex="-1" role="button" aria-disabled="true">Signer</a>
+                <span class="badge bg-success">Déjà signé</span>
+              <% } %>
+            <% } else { %>
+              <span class="badge bg-secondary">Cours passé</span>
+            <% } %>
+          </p>
+        </div>
+      </div>
+    <% } %>
+  <% }) %>
 </div>

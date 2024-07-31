@@ -7,22 +7,47 @@ const Student = require('../models/Student');
 const User = require('../models/User');
 
 async function getAllPromotions(req, res) {
-    Promotion.getAllPromotions((err, promotions) => {
-        if (err) res.status(500).send(err);
-        else {
-            School.getAllSchools((err, schools) => {
-                if (err) res.status(500).send(err);
-                else {
-                    promotions = promotions.map(promotion => {
-                        promotion.school = schools.find(school => school.id === promotion.school_id);
-                        return promotion;
-                    });
-                    res.render('promotions', { promotions });
-                }
+    const userId = req.user.id;
+    const userRoles = req.user.roles;
+
+    try {
+        let promotions;
+
+        if (userRoles.includes('ROLE_USER')) {
+            promotions = await new Promise((resolve, reject) => {
+                Promotion.getPromotionsByStudentId(userId, (err, results) => {
+                    if (err) return reject(err);
+                    resolve(results);
+                });
             });
+        } else if (userRoles.includes('ROLE_PROF') || userRoles.includes('ROLE_ADMIN')) {  // Assuming 'ROLE_PROF' is for professors and 'ROLE_ADMIN' is for admins
+            promotions = await new Promise((resolve, reject) => {
+                Promotion.getAllPromotions((err, results) => {
+                    if (err) return reject(err);
+                    resolve(results);
+                });
+            });
+        } else {
+            return res.status(403).send('Forbidden');
         }
-    });
-};
+
+        const schools = await new Promise((resolve, reject) => {
+            School.getAllSchools((err, results) => {
+                if (err) return reject(err);
+                resolve(results);
+            });
+        });
+
+        promotions = promotions.map(promotion => {
+            promotion.school = schools.find(school => school.id === promotion.school_id);
+            return promotion;
+        });
+
+        res.render('promotions', { promotions, user: req.user });
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
 
 async function getPromotionById(req, res) {
     Promotion.getPromotionById(req.params.id, (err, promotion) => {
@@ -153,12 +178,14 @@ async function getPromotionStudents(req, res) {
             if (err) {
                 return res.status(500).json(err);
             }
-            res.render('promotionStudents', { promotion, students });
+            res.render('promotionStudents', { promotion, students, user: req.user });
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 }
+
+
 
 module.exports = {
     getAllPromotions,

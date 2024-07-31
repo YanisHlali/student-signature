@@ -48,7 +48,6 @@ passport.deserializeUser((id, done) => {
         });
       });
       user.roles = roles.map(role => role.name);
-      console.log("User roles:", user.roles);
       done(null, user);
     } catch (error) {
       done(error, false);

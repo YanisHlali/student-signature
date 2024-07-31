@@ -7,12 +7,28 @@ const Attendance = require('../models/Attendance');
 
 async function getAllCourses(req, res) {
     try {
-        const courses = await new Promise((resolve, reject) => {
-            Course.getAllCourses((err, courses) => {
-                if (err) return reject(err);
-                resolve(courses);
+        const userId = req.user.id;
+        const userRoles = req.user.roles;
+
+        let courses = [];
+
+        if (userRoles.includes('ROLE_ADMIN')) {
+            courses = await new Promise((resolve, reject) => {
+                Course.getAllCourses((err, courses) => {
+                    if (err) return reject(err);
+                    resolve(courses);
+                });
             });
-        });
+        } else if (userRoles.includes('ROLE_PROF')) {
+            courses = await new Promise((resolve, reject) => {
+                Course.getCoursesByProfessor(userId, (err, courses) => {
+                    if (err) return reject(err);
+                    resolve(courses);
+                });
+            });
+        } else {
+            return res.status(403).send('Forbidden');
+        }
 
         const professors = await new Promise((resolve, reject) => {
             User.getAllProfessors((err, professors) => {
@@ -40,7 +56,7 @@ async function getAllCourses(req, res) {
             course.class_end = new Date(course.class_end).toLocaleString();
         }
 
-        res.render('courses', { courses, professors, subjects, promotions });
+        res.render('courses', { courses, professors, subjects, promotions, user: req.user });
     } catch (err) {
         res.status(500).json(err);
     }
